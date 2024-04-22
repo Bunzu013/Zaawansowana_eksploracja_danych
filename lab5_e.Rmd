@@ -1,0 +1,188 @@
+---
+title: "Countries"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    
+    source_code: embed
+runtime: shiny
+---
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(dplyr)
+library(ggplot2)
+country_data <- NULL
+combined_data <- readRDS(file = "combined_data.RData")
+```
+
+About {data-icon="fa-list"}
+=====================================
+
+Column {data-width=500}
+------------------------------
+### Info{width=5}
+Norway - formally the Kingdom of Norwa - a Nordic country in Northern Europe.  Its capital is Oslo, and the country is known for its high standard of living, social equality, and emphasis on environmental sustainability. It has a constitutional monarchy and a mixed economy, with significant state ownership in key sectors.
+ Its stunning landscapes offer abundant opportunities for outdoor activities like hiking and skiing, with national parks like Jotunheimen attracting enthusiasts. The country's oil and gas industry has driven significant wealth, reflected in its large sovereign wealth fund. Northern Norway provides prime viewing spots for the mesmerizing Northern Lights. 
+```{r}
+
+```
+### Wikings{width=500}
+Vikings were seafaring Norse people from Scandinavia, mainly during the Viking Age, which spanned roughly from the late 8th century to the late 11th century. They were known for their maritime skills, exploration, trade, and often raiding activities across Europe, reaching as far as North America. Vikings came from what are now modern-day Denmark, Norway, and Sweden. They played a significant role in European history, influencing trade, culture, and warfare during their time. Today, they are often romanticized in popular culture and remembered for their iconic longships, mythology, and adventurous spirit.
+
+
+```{r}
+
+```
+
+### Mithology
+Norse mythology is a collection of myths and legends from ancient Scandinavia, featuring gods like Odin and Thor, tales of creation and destruction, and mythical creatures like dragons and giants. It's rich in storytelling and reflects the beliefs and culture of the Norse people.
+```{r}
+
+```
+
+Column {data-width=800}
+------------------------------
+### Flag
+
+```{r}
+file1 <- "flag.jpg"
+file1 <- "flag.jpg"
+
+output$flag <- renderImage({
+  list(src = file1,
+       contentType = 'image/jpg',
+       width = 300)
+}, deleteFile = FALSE)  # Dodaj deleteFile = FALSE, aby utrzymać plik po zakończeniu sesji
+
+# Wyśrodkowanie obrazu w kolumnie
+tags$div(
+  class = "text-center",  # Wyśrodkowanie w pionie
+  imageOutput("flag")
+)
+```
+
+### Map
+```{r}
+file2 <- "map_b.jpg"
+file3 <- "map.jpg"
+
+
+output$map_b <- renderImage({
+  list(src = file2,
+       contentType = 'image/jpg',
+       width = 300,
+       height = 300)
+})
+
+output$map <- renderImage({
+  list(src = file3,
+       contentType = 'image/jpg',
+       width = 300,
+       height = 300)
+})
+
+fluidRow(
+  column(width = 6, 
+         imageOutput("map_b")
+  ),
+  column(width = 6, 
+         imageOutput("map")
+  )
+)
+```
+
+Norway {data-icon="fa-list"}
+=====================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### Dot plot
+```{r}
+
+# Load the combined data
+combined_data <- readRDS(file = "combined_data.RData")
+
+country_data <- combined_data %>% filter(country == "NOR")
+# First plot
+ggp1 <- ggplot(data = country_data, mapping = aes(x = height, y = weight, color = factor(year))) + 
+  geom_point() +
+  scale_color_discrete(labels = c("1890", "1990"))
+print(ggp1)
+
+
+```
+
+
+### Violin plot
+```{r}
+# Second plot
+ggp2 <- ggplot(data = country_data, mapping = aes(x = sex, y = height, fill = factor(year))) + 
+  geom_violin(trim = F) +
+  geom_boxplot(width = 0.1, color = "white", fill = "white", alpha = 0.2) +
+  geom_jitter(alpha = 0.3) + 
+  geom_rug() + scale_color_discrete(labels = c("1890", "1990"))
+
+# Print plots
+
+print(ggp2)
+
+```
+
+
+Column {data-width=300}
+------------------------------
+### All data
+```{r}
+
+countryData <- renderTable({
+  country_data
+})
+countryData
+```
+
+Comparison {data-icon="fa-list"}
+=====================================
+Column {data-width=500}
+-----------------------------------------------------------------------
+### Dot plot
+```{r}
+### Dot plot
+ggplot(data = combined_data, mapping = aes(x=height, fill=country)) + 
+  facet_wrap(facets=vars(sex))+
+  geom_histogram(bins=30)
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### Density Plot
+```{r}
+p <- ggplot(combined_data, aes(x = height, fill = country)) +
+  stat_density(aes(color = factor(country)), position = "identity", geom = "line") +
+  labs(title = "Density Plot of Height by Country",
+       x = "Height",
+       y = "Density") +
+  theme_minimal()
+
+print(p)
+
+```
+
+
+### Dot plot
+```{r}
+
+# First plot
+ggp1 <- ggplot(data = combined_data, mapping = aes(x = height, y = weight, color = factor(year))) + 
+  geom_point() +
+  scale_color_discrete(labels = c("1890", "1990"))
+print(ggp1)
+
+
+```
+
+Dumbell plot {data-icon="fa-list"}
+=====================================
+
+
